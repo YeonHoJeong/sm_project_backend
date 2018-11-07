@@ -10,3 +10,9 @@ export const transactionCall = async (req, res) => {
 
     res.send(startSql);
 };
+
+export const imageUploadTest = async (req, res) => {
+
+    console.log(req.files);
+    res.send(req.files);
+};

@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/cli": "^7.1.2",
+    "aws-sdk": "^2.348.0",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
@@ -19,6 +20,7 @@
     "express": "^4.16.4",
     "http-errors": "^1.7.1",
     "morgan": "^1.9.1",
+    "multer": "^1.4.1",
     "mysql": "^2.16.0",
     "path": "^0.12.7",
     "promise-mysql": "^3.3.1",
