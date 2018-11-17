@@ -1,7 +1,7 @@
-import {fetchTotalFeed} from '../../../database/total_feed/query';
+import {getTotalFeed} from '../../../database/total_feed/query';
 
-export const fetch = async (req, res) => {
-    let startSql = await fetchTotalFeed();
+export const getFeed = async (req, res) => {
+    let startSql = await getTotalFeed();
 
     res.send(startSql);
 };

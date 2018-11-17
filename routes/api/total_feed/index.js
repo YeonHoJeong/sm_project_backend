@@ -1,7 +1,7 @@
 import express from 'express';
-import {fetch} from './controller.js';
+import {getFeed} from './controller.js';
 let router = express.Router();
 
-router.get('/fetch',fetch);
+router.get('/get_feed',getFeed);
 
 module.exports = router;
