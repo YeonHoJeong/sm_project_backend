@@ -6,9 +6,14 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import aws from 'aws-sdk';
+
+
+aws.config.loadFromPath(__dirname + '/../config/s3config.json');
 
 
 let app = express();
+
 
 // view engine setup
 app.set('view engine', 'pug');
