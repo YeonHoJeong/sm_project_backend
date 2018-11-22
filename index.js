@@ -1,7 +1,7 @@
 /**
  * Module dependencies.
  */
-
+import '@babel/polyfill';
 import app from './src/app';
 import http from 'http';
 
