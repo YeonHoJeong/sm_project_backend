@@ -15,7 +15,7 @@ export const insertPostLike = connect(async (con, req) => {
     let query = "INSERT INTO `like` " +
         "(post_id, user_id) VALUES (?, ?); "; // 쿼리문 작성시 맨 뒤에 공백 넣어줄 것
     try{
-        const result = await con.query(query, [userId, postId]);
+        const result = await con.query(query, [postId, userId]);
         console.log(result);
     } catch(e){
         return false;
@@ -37,7 +37,7 @@ export const deletePostLike = connect(async (con, req) => {
     let query = "DELETE FROM `like` " +
         "WHERE `like`.post_id = ? AND `like`.user_id = ?; ";
     try{
-        const result = await con.query(query, [userId, postId]);
+        const result = await con.query(query, [postId, userId]);
         console.log(result);
     } catch(e){
         return false;
