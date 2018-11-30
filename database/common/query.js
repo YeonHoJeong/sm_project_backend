@@ -53,7 +53,6 @@ export const deletePostLike = connect(async (con, req) => {
 export const getTagList = connect(async (con, req) => {
     let query = "SELECT id, type, contents FROM tag; ";
     const result = await con.query(query, []);
-    console.log(result);
     return result
 
 });
