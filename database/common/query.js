@@ -44,3 +44,16 @@ export const deletePostLike = connect(async (con, req) => {
     }
     return true;
 });
+
+/*
+* getTagList - 모든 태그의 리스트들 넘김
+* 원래 이러면 안되지만,, 일단.
+ */
+
+export const getTagList = connect(async (con, req) => {
+    let query = "SELECT id, type, contents FROM tag; ";
+    const result = await con.query(query, []);
+    console.log(result);
+    return result
+
+});

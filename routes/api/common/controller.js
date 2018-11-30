@@ -1,4 +1,4 @@
-import {insertPostLike, deletePostLike} from '../../../database/common/query';
+import {insertPostLike, deletePostLike, getTagList} from '../../../database/common/query';
 
 export const insertLike = async (req, res) => {
     let result = await insertPostLike(req);
@@ -18,4 +18,9 @@ export const deleteLike = async (req, res) => {
     } else{
         res.send(500, {message :"fail"});
     }
+};
+
+export const getTag = async (req, res) => {
+    let data = await getTagList(req);
+    res.send(data);
 };
