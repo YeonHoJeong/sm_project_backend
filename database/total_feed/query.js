@@ -13,7 +13,6 @@ export const getTotalFeed = connect(async (con, req) =>{
         "IF (`like`.user_id = 2, TRUE, FALSE) as selectLike, postAttachment.version " +
         "FROM post " +
         "LEFT JOIN `like` ON post.id = `like`.post_id AND `like`.user_id = ? " +
-        "LEFT JOIN postVersion ON post.id = postVersion.post_id " +
         "LEFT JOIN postAttachment ON post.id = postAttachment.post_id " +
         "WHERE postAttachment.type = 0  AND postAttachment.version = (SELECT MAX(version) FROM postAttachment WHERE postAttachment.post_id = post.id) " +
         "GROUP BY post.id, postAttachment.url, `like`.user_id,postAttachment.version ; "; // 쿼리문 작성시 맨 뒤에 공백 넣어줄 것
