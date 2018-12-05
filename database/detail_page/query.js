@@ -9,9 +9,10 @@ export const getPostDetailData = connect(async(con, req) => {
 
     let maxPostVersionQs = "SELECT max(version) as maxVersion FROM postContents WHERE post_id = ?; "; //포스트 최대 몇 버전까지 있는지
 
-    let userDataQs = "SELECT user.name, user.email, user.intro_text " +
-        "FROM user " +
-        "WHERE user.id = ?; ";
+    let userDataQs = "SELECT user.id, user.name, user.email, user.intro_text " +
+        "FROM post " +
+        "LEFT JOIN `user` ON user.id = post.user_id " +
+        "WHERE post.id = ?; ";
 
     let postDetailQs = "SELECT `post`.title, `postContents`.contents, `post`.updated_time, " +
         "(SELECT COUNT(*) FROM `like` WHERE `like`.post_id = post.id ) as likeCount, " +
@@ -42,7 +43,7 @@ export const getPostDetailData = connect(async(con, req) => {
 
     const maxPostVersion = await con.query(maxPostVersionQs, [postId]);
     console.log(maxPostVersion);
-    const userData = await con.query(userDataQs, [userId]);
+    const userData = await con.query(userDataQs, [postId]);
     console.log(userData);
 
     const postDetail = await con.query(postDetailQs, [userId, userId, postId, postVersion === -1 ? maxPostVersion[0].maxVersion : postVersion]);

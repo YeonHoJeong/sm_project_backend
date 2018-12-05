@@ -6,4 +6,5 @@ let router = express.Router();
 router.get('/get_post_detail', getPostDetail);
 router.post('/insert_comment',multer().any(), insertComment);
 
+
 module.exports = router;

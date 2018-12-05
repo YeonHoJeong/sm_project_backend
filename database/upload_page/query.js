@@ -51,4 +51,7 @@ export const insertPostAndImg = transaction(async (con, req) =>{
     return true;
 });
 
+export const versionUpPost = transaction(async (con, req) => {
 
+
+});
