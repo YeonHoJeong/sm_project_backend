@@ -10,7 +10,7 @@ import {connect, transaction} from '../db';
 export const getTotalFeed = connect(async (con, req) =>{
     let userId = req.query.user_id;
     let query = "SELECT post.id as postId, post.title, postAttachment.url, (SELECT COUNT(*) FROM `like` WHERE `like`.post_id = post.id ) as likeCount, " +
-        "IF (`like`.user_id = 2, TRUE, FALSE) as selectLike, postAttachment.version " +
+        "IF (`like`.user_id = ?, TRUE, FALSE) as selectLike, postAttachment.version, post.updated_time " +
         "FROM post " +
         "LEFT JOIN `like` ON post.id = `like`.post_id AND `like`.user_id = ? " +
         "LEFT JOIN postAttachment ON post.id = postAttachment.post_id " +
