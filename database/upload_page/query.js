@@ -52,6 +52,35 @@ export const insertPostAndImg = transaction(async (con, req) =>{
 });
 
 export const versionUpPost = transaction(async (con, req) => {
+    let postData = JSON.parse(req.body.postData);
+    let postId = postData.postId;
+    let postFileData = req.files;
 
+    let getMaxVersionQs = "SELECT max(version) as maxVersion FROM postContents WHERE post_id = ?; ";
 
+    let insertPostContentsQs = "INSERT INTO `postContents` (post_id, version, contents) VALUES(?, ?, ?); "; //insert Post Contents
+    let insertPostAttachmentQs = "INSERT INTO `postAttachment` (post_id, type, version, url) VALUES (?, ?, ?, ?); ";    // Post이미지 s3에 업로드 후 추가
+
+    const getMaxVersion = await con.query(getMaxVersionQs, [postId]);
+
+    let postVersion = Number(getMaxVersion[0].maxVersion)+1;
+    console.log(postVersion);
+
+    const insertPostContents = await con.query(insertPostContentsQs, [postId, postVersion, postData.contents]);
+
+    for(let i=0; i<postFileData.length; i++){   // 버전 1로 추가하는 개념임, insert 이기때문, 그 이후의 버전은 version을 추가하는 개념으로
+        if( await uploadS3("post/"+postId+"/contents/" + postVersion,i+".png",req.files[i]) !== false){
+            if(i === 0){    //썸네일
+                await con.query(insertPostAttachmentQs, [postId, 0, postVersion, "https://s3.ap-northeast-2.amazonaws.com/smproject2018/post/"+postId+"/contents/"+postVersion+"/"+i+".png" ])
+            }
+            else{   //나머지 이미지
+                await con.query(insertPostAttachmentQs, [postId, 1, postVersion, "https://s3.ap-northeast-2.amazonaws.com/smproject2018/post/"+postId+"/contents/"+postVersion+"/"+i+".png" ])
+            }
+        } else{
+            await con.rollback();
+            return false;
+        }
+    }
+
+    return true;
 });

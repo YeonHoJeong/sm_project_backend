@@ -106,4 +106,6 @@ export const insertPostComment = transaction(async(con, req) =>{
             return false;
         }
     }
+
+    return true;
 });
