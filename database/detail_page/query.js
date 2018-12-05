@@ -1,4 +1,5 @@
 import {connect, transaction} from '../db';
+import {uploadS3} from'../../lib/upload';
 
 export const getPostDetailData = connect(async(con, req) => {
     const postId = req.query.postId;
@@ -30,7 +31,7 @@ export const getPostDetailData = connect(async(con, req) => {
         "LEFT JOIN `tag` ON `tag`.id = `tagAttachment`.tag_id " +
         "WHERE `tagAttachment`.post_id = ? ";
 
-    let commentListQs = "SELECT `comment`.id, `comment`.post_id, `comment`.com_id, `comment`.contents, `comment`.selectType, `comment`.created_time " +
+    let commentListQs = "SELECT `comment`.id, `comment`.post_id, `comment`.com_id, `comment`.contents, `comment`.select_type, `comment`.created_time " +
         "FROM `comment` " +
         "WHERE `comment`.post_id = ? "; // comment 리스트
 
@@ -56,9 +57,9 @@ export const getPostDetailData = connect(async(con, req) => {
     if(commentList.length > 0){ //코멘트가 있어야함
         for(let i=0; i<commentList.length; i++){
             if(i !== commentList.length -1){
-                commentAttachmentQs += "comment_id = " + commentList[i].comment_id + " AND ";
+                commentAttachmentQs += "comment_id = " + commentList[i].id + " OR ";
             } else if (i === commentList.length -1 ){
-                commentAttachmentQs += "comment_id = " + commentList[i].comment_id;
+                commentAttachmentQs += "comment_id = " + commentList[i].id;
             }
         }
          commentAttachment = await con.query(commentAttachmentQs, []);
@@ -77,4 +78,31 @@ export const getPostDetailData = connect(async(con, req) => {
     };
 
     return result;
+});
+
+export const insertPostComment = transaction(async(con, req) =>{
+
+    let commentData = JSON.parse(req.body.commentData);
+    let postId = commentData.postId;
+    let commentFile = req.files;
+
+    let commentQs = "INSERT INTO `comment` (post_id, com_id, com_pw, contents) VALUES (?, ?, ?, ?); ";
+    let commentAttachmentQs = "INSERT INTO `commentAttachment` (comment_id, url) VALUES (?, ?); ";
+
+    const insertComment = await con.query(commentQs, [postId, commentData.comId, commentData.comPw, commentData.contents]);
+
+    /*Upload Post ... Insert Post Attachment*/
+    for(let i=0; i<commentFile.length; i++){   // 버전 1로 추가하는 개념임, insert 이기때문, 그 이후의 버전은 version을 추가하는 개념으로
+        if( await uploadS3("post/"+postId+"/comment/"+insertComment.insertId,i+".png",req.files[i]) !== false){
+            if(i === 0){    //썸네일
+                await con.query(commentAttachmentQs, [insertComment.insertId,"https://s3.ap-northeast-2.amazonaws.com/smproject2018/post/"+postId+"/comment/"+insertComment.insertId+"/"+i+".png" ])
+            }
+            else{   //나머지 이미지
+                await con.query(commentAttachmentQs, [insertComment.insertId, "https://s3.ap-northeast-2.amazonaws.com/smproject2018/post/"+postId+"/comment/"+insertComment.insertId+"/"+i+".png" ])
+            }
+        } else{
+            await con.rollback();
+            return false;
+        }
+    }
 });
