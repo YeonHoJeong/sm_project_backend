@@ -14,7 +14,7 @@ export const getPostDetailData = connect(async(con, req) => {
         "LEFT JOIN `user` ON user.id = post.user_id " +
         "WHERE post.id = ?; ";
 
-    let postDetailQs = "SELECT `post`.title, `postContents`.contents, `post`.updated_time, " +
+    let postDetailQs = "SELECT `post`.id as post_id, `post`.title, `postContents`.contents, `post`.updated_time, " +
         "(SELECT COUNT(*) FROM `like` WHERE `like`.post_id = post.id ) as likeCount, " +
         "IF (`like`.user_id = ?, TRUE, FALSE) as selectLike " +
         "FROM post " +
