@@ -56,3 +56,18 @@ export const getTagList = connect(async (con, req) => {
     return result
 
 });
+
+export const insertUserData = transaction(async (con, req) =>{
+
+    let userData = req.body.userData;
+
+    let query ="INSERT INTO user (type, name, email, phone) VALUES (?, ?, ?, ?); ";
+    try {
+        const result = await con.query(query, [0, userData.name, userData.email, userData.phone]);
+    } catch(e){
+        console.log(e);
+        return false;
+    }
+    return true;
+
+});

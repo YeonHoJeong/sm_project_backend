@@ -23,7 +23,7 @@ export const getPostDetailData = connect(async(con, req) => {
         "WHERE `post`.id = ? AND `postContents`.version = ? " +
         "GROUP BY `like`.user_id; "; // 포스트 상세내용 (contents도 조인걸고 같이)
 
-    let postAttachmentQs = "SELECT `postAttachment`.post_id,`postAttachment`.url, `postAttachment`.type , `postAttachment`.version " +
+    let postAttachmentQs = "SELECT `postAttachment`.url, `postAttachment`.type , `postAttachment`.version " +
         "FROM postAttachment " +
         "WHERE postAttachment.post_id = ? AND postAttachment.version = ?; "; //포스트 추가내용들
 
@@ -32,8 +32,9 @@ export const getPostDetailData = connect(async(con, req) => {
         "LEFT JOIN `tag` ON `tag`.id = `tagAttachment`.tag_id " +
         "WHERE `tagAttachment`.post_id = ? ";
 
-    let commentListQs = "SELECT `comment`.id, `comment`.post_id, `comment`.com_id, `comment`.contents, `comment`.select_type, `comment`.created_time " +
+    let commentListQs = "SELECT `comment`.id, `user`.name, `comment`.contents, `comment`.select_type, `comment`.created_time " +
         "FROM `comment` " +
+        "LEFT JOIN user ON user.id = `comment`.user_id " +
         "WHERE `comment`.post_id = ? "; // comment 리스트
 
     let commentAttachmentQs = "SELECT `commentAttachment`.comment_id, `commentAttachment`.url, `commentAttachment`.created_time " +
@@ -85,12 +86,13 @@ export const insertPostComment = transaction(async(con, req) =>{
 
     let commentData = JSON.parse(req.body.commentData);
     let postId = commentData.postId;
+
     let commentFile = req.files;
 
-    let commentQs = "INSERT INTO `comment` (post_id, com_id, com_pw, contents) VALUES (?, ?, ?, ?); ";
+    let commentQs = "INSERT INTO `comment` (post_id, user_id, contents) VALUES (?, ?, ?); ";
     let commentAttachmentQs = "INSERT INTO `commentAttachment` (comment_id, url) VALUES (?, ?); ";
 
-    const insertComment = await con.query(commentQs, [postId, commentData.comId, commentData.comPw, commentData.contents]);
+    const insertComment = await con.query(commentQs, [postId, commentData.userId, commentData.contents]);
 
     /*Upload Post ... Insert Post Attachment*/
     for(let i=0; i<commentFile.length; i++){   // 버전 1로 추가하는 개념임, insert 이기때문, 그 이후의 버전은 version을 추가하는 개념으로
