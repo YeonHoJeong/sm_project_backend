@@ -1,6 +1,7 @@
 import {connect, transaction} from '../db';
 import {uploadS3} from'../../lib/upload';
-
+/*  getPostDetailData - 특정 포스트의 상세 페이지
+ */
 export const getPostDetailData = connect(async(con, req) => {
     const postId = req.query.postId;
     const userId = req.query.userId;
@@ -32,7 +33,7 @@ export const getPostDetailData = connect(async(con, req) => {
         "LEFT JOIN `tag` ON `tag`.id = `tagAttachment`.tag_id " +
         "WHERE `tagAttachment`.post_id = ? ";
 
-    let commentListQs = "SELECT `comment`.id, `user`.name, `comment`.contents, `comment`.select_type, `comment`.created_time " +
+    let commentListQs = "SELECT `comment`.id, `user`.name, `comment`.contents, `comment`.version, `comment`.select_type, `comment`.created_time " +
         "FROM `comment` " +
         "LEFT JOIN user ON user.id = `comment`.user_id " +
         "WHERE `comment`.post_id = ? "; // comment 리스트
@@ -81,7 +82,9 @@ export const getPostDetailData = connect(async(con, req) => {
 
     return result;
 });
+/* insertPostComment - post에 comment를 추가하는 쿼리
 
+ */
 export const insertPostComment = transaction(async(con, req) =>{
 
     let commentData = JSON.parse(req.body.commentData);
@@ -89,10 +92,10 @@ export const insertPostComment = transaction(async(con, req) =>{
 
     let commentFile = req.files;
 
-    let commentQs = "INSERT INTO `comment` (post_id, user_id, contents) VALUES (?, ?, ?); ";
+    let commentQs = "INSERT INTO `comment` (post_id, user_id, contents, version) VALUES (?, ?, ?, ?); ";
     let commentAttachmentQs = "INSERT INTO `commentAttachment` (comment_id, url) VALUES (?, ?); ";
 
-    const insertComment = await con.query(commentQs, [postId, commentData.userId, commentData.contents]);
+    const insertComment = await con.query(commentQs, [postId, commentData.userId, commentData.contents, commentData.version]);
 
     /*Upload Post ... Insert Post Attachment*/
     for(let i=0; i<commentFile.length; i++){   // 버전 1로 추가하는 개념임, insert 이기때문, 그 이후의 버전은 version을 추가하는 개념으로
@@ -107,6 +110,22 @@ export const insertPostComment = transaction(async(con, req) =>{
             await con.rollback();
             return false;
         }
+    }
+
+    return true;
+});
+
+export const commentSelectQuery = transaction(async (con, req) => {
+
+    let selectData = req.body.selectData;
+
+    let query = "UPDATE `comment` SET select_type = ? WHERE `comment`.id = ?; ";
+
+    try {
+        const result = await con.query(query, [selectData.selectType, selectData.id]);
+    } catch(e){
+        console.log(e);
+        return false;
     }
 
     return true;

@@ -57,6 +57,11 @@ export const getTagList = connect(async (con, req) => {
 
 });
 
+/*
+* insertUserData - 유저 데이터 INSERT
+* 처음 스플래시 이후 로그인 페이지에서 입력 받고, 추가 하는 부분
+*
+ */
 export const insertUserData = transaction(async (con, req) =>{
 
     let userData = req.body.userData;
