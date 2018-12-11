@@ -76,3 +76,22 @@ export const insertUserData = transaction(async (con, req) =>{
     return true;
 
 });
+
+/*
+
+
+ */
+
+export const getUserDataQuery = connect(async (con, req) => {
+
+    let phone = req.query.phone;
+
+    let query = "SELECT id, name, email, phone " +
+        "FROM user " +
+        "WHERE phone = ? ";
+
+    const result = await con.query(query, [phone]);
+
+    return result;
+
+});
