@@ -33,7 +33,7 @@ export const getPostDetailData = connect(async(con, req) => {
         "LEFT JOIN `tag` ON `tag`.id = `tagAttachment`.tag_id " +
         "WHERE `tagAttachment`.post_id = ? ";
 
-    let commentListQs = "SELECT `comment`.id, `user`.name, `comment`.contents, `comment`.version, `comment`.select_type, `comment`.created_time " +
+    let commentListQs = "SELECT `comment`.id, `user`.id, `user`.name, `comment`.contents, `comment`.version, `comment`.select_type, `comment`.created_time " +
         "FROM `comment` " +
         "LEFT JOIN user ON user.id = `comment`.user_id " +
         "WHERE `comment`.post_id = ? "; // comment 리스트
